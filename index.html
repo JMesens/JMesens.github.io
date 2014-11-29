@@ -11,7 +11,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 
 
-
 </head>
 
 <body>
@@ -20,10 +19,8 @@
 
 </div>
 
-
-
 <script language="JavaScript">
-    var game = {jeff:[20,20,20,18,18,25],michiel:[20,20,20,18,18,25,25]};
+    var game = {Player1:[20,20,20,18,18,25],Player2:[20,20,20,18,18,25,25]};
 
 
     function count(player,number) {
@@ -42,6 +39,11 @@
         var header = table.createTHead();
         var header_row = header.insertRow();
 
+
+        var header_cel_name = document.createElement('th');
+        header_cel_name.innerText = "Name";
+        header_row.appendChild(header_cel_name);
+
         for(var i = 15;i<=20;i++){
             var header_cel = document.createElement('th');
             header_cel.innerText = i;
@@ -49,7 +51,7 @@
         }
 
         var header_cel = document.createElement('th');
-        header_cel.innerText = "B";
+        header_cel.innerText = "Bull";
         header_row.appendChild(header_cel);
 
         for(var player in game) {
@@ -57,6 +59,9 @@
             console.log(game[player]);
 
             var row = table.insertRow();
+
+            var celName = row.insertCell();
+            celName.innerText = player;
 
             for(var i = 15;i<=20;i++){
                 var cel = row.insertCell();
@@ -71,13 +76,29 @@
         document.getElementById("scoreboard").appendChild(table);
     }
 
+    function add(){
+        var name_input = document.getElementById("newPlayer");
+        var name = name_input.value;
+        name_input.value = "" ;
+        game[name] = new Array;
 
+        drawGame();
+    }
 
 
 
     drawGame();
 
+
 </script>
+
+<div class="input-group input-group-lg">
+    <input type="text" class="form-control" id="newPlayer" placeholder="New player's name">
+    <span class="input-group-btn">
+        <button class="btn btn-default" type="button" onclick="add()">Add</button>
+    </span>
+</div>
+
 
 </body>
 </html>
