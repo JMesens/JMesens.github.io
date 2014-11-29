@@ -1,0 +1,83 @@
+<html>
+<head>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+
+
+</head>
+
+<body>
+
+<div id="scoreboard">
+
+</div>
+
+
+
+<script language="JavaScript">
+    var game = {jeff:[20,20,20,18,18,25],michiel:[20,20,20,18,18,25,25]};
+
+
+    function count(player,number) {
+        return jQuery.grep(player, function (a) {
+            return a == number;
+        }).length;
+    }
+    function drawGame(){
+        if(document.getElementById("board")!=null){
+            document.getElementById("scoreboard").removeChild(document.getElementById("board"));
+        }
+        var table = document.createElement("table");
+        table.id = 'board';
+        table.className = "table table-bordered";
+
+        var header = table.createTHead();
+        var header_row = header.insertRow();
+
+        for(var i = 15;i<=20;i++){
+            var header_cel = document.createElement('th');
+            header_cel.innerText = i;
+            header_row.appendChild(header_cel);
+        }
+
+        var header_cel = document.createElement('th');
+        header_cel.innerText = "B";
+        header_row.appendChild(header_cel);
+
+        for(var player in game) {
+
+            console.log(game[player]);
+
+            var row = table.insertRow();
+
+            for(var i = 15;i<=20;i++){
+                var cel = row.insertCell();
+                cel.innerText = count(game[player],i);
+            }
+
+            var celBull = row.insertCell();
+            celBull.innerText = count(game[player],25);
+
+
+        }
+        document.getElementById("scoreboard").appendChild(table);
+    }
+
+
+
+
+
+    drawGame();
+
+</script>
+
+</body>
+</html>
