@@ -154,8 +154,22 @@
     }
 
     function saveHits(){
+        var player = $('#modalPlayerName')[0].innerText;
         for(var hit in hits){
-            game[$('#modalPlayerName')[0].innerText].hits.push(hits[hit]);
+            var playerHits = count(game[player].hits,hits[hit]);
+            if(playerHits>=3){
+                for(var player in game){
+                    if(count(game[player].hits,hits[hit])<3){
+                        game[player].score+=hits[hit];
+                    }
+                }
+            }else{
+
+                game[player].hits.push(hits[hit]);
+
+            }
+
+
 
         }
 
