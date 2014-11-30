@@ -90,6 +90,42 @@
 
 
 <script language="JavaScript">
+
+    function Player(name){
+        this.name = name;
+        this.hits = new Array();
+        this.score = 0;
+        this.count = function(number){
+            return jQuery.grep(this.hits, function (a) {
+                return a == number;
+            }).length;
+        }
+    }
+    function Game(){
+        this.players = new Array();
+
+        this.getPlayer = function(name){
+            for(var p in this.players){
+                if(this.players[p].name == name){
+                    return this.players[p];
+                }
+            }
+            return null;
+        }
+
+        this.addPlayer = function(name){
+            this.players.push(new Player(name));
+        }
+
+    };
+
+    var g = new Game();
+    g.addPlayer('jeff');
+
+
+
+
+
     var game = {Player1:{hits:[20,20,20,18,18,25],score:25},Player2:{hits:[20,20,20,18,18,25,25,25],score:20}};
     if(localStorage.getItem('game')!=null){
         game = JSON.parse(localStorage.getItem('game'));drawGame();
