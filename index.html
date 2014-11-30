@@ -23,8 +23,6 @@
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="js/bootstrap.min.js"></script>
 
-
-
 <div class="container">
     <b>Cricket Cut Throat Scoreboard</b>
     <p>Tab a player's name to register hits.</p>
@@ -38,6 +36,9 @@
         <button class="btn btn-default" type="button" onclick="addPlayer();">Add</button>
     </span>
     </div>
+
+    <br/><br/><br/>
+    <p class="text-right"><a onclick="confirmReset();">Reset</a></p>
 
     <!-- Modal -->
     <div class="modal fade" id="hitModal" tabindex="-1" role="dialog" aria-labelledby="modalPlayerName" aria-hidden="true">
@@ -67,12 +68,32 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="modalConfirmLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="modalConfirmLabel">Are you sure?</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Resetting will remove all current players and scores.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="reset();">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 
 
 <script language="JavaScript">
     var game = {Player1:{hits:[20,20,20,18,18,25],score:25},Player2:{hits:[20,20,20,18,18,25,25,25],score:20}};
+    if(localStorage.getItem('game')!=null){
+        game = JSON.parse(localStorage.getItem('game'));drawGame();
+    }
 
     $("#newPlayer").keyup(function(event){
         if(event.keyCode == 13){
@@ -136,9 +157,13 @@
 
         }
         $("#scoreboard")[0].appendChild(table);
+
+        // Persist the scoreboard
+        localStorage.setItem('game',JSON.stringify(game));
     }
 
     function select(player){
+        hits = new Array();
         console.log("Selected: ", player);
         $('#modalPlayerName')[0].innerText = player;
 
@@ -174,13 +199,9 @@
                     }
                 }
             }else{
-
                 game[player].hits.push(hit);
 
             }
-
-
-
         }
 
         clearHits();
@@ -194,7 +215,6 @@
 
     }
 
-
     function addPlayer(){
         var name_input = $("#newPlayer")[0];
         var name = name_input.value;
@@ -207,10 +227,18 @@
         }
     }
 
+    function confirmReset(){
+        $('#confirmModal').modal('toggle');
+    }
 
+
+    function reset(){
+        game = new Object();
+        drawGame();
+        $('#confirmModal').modal('toggle');
+    }
 
     drawGame();
-
 
 </script>
 
