@@ -26,6 +26,8 @@
 
 
 <div class="container">
+    <b>Cricket Cut Throat Scoreboard</b>
+    <p>Tab a player's name to register hits.</p>
     <div id="scoreboard">
 
     </div>
@@ -33,7 +35,7 @@
     <div class="input-group input-group-lg">
         <input type="text" class="form-control" id="newPlayer" placeholder="New player's name">
     <span class="input-group-btn">
-        <button class="btn btn-default" type="button" onclick="addPlayer()">Add</button>
+        <button class="btn btn-default" type="button" onclick="addPlayer();">Add</button>
     </span>
     </div>
 
@@ -60,7 +62,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal" onclick="clearHits();">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="saveHits();">Save changes</button>
+                    <button type="button" class="btn btn-primary" onclick="saveHits();">Register hit</button>
                 </div>
             </div>
         </div>
@@ -71,6 +73,12 @@
 
 <script language="JavaScript">
     var game = {Player1:{hits:[20,20,20,18,18,25],score:25},Player2:{hits:[20,20,20,18,18,25,25,25],score:20}};
+
+    $("#newPlayer").keyup(function(event){
+        if(event.keyCode == 13){
+            addPlayer();
+        }
+    });
 
     function count(player,number) {
         return jQuery.grep(player, function (a) {
@@ -149,23 +157,25 @@
         hitLabel.className="label label-success";
         hitLabel.innerText=number;
         $('#modalHits')[0].appendChild(hitLabel);
+
         hits.push(number);
 
     }
 
     function saveHits(){
         var player = $('#modalPlayerName')[0].innerText;
-        for(var hit in hits){
-            var playerHits = count(game[player].hits,hits[hit]);
+        for(var i in hits){
+            var hit = hits[i];
+            var playerHits = count(game[player].hits,hit);
             if(playerHits>=3){
-                for(var player in game){
-                    if(count(game[player].hits,hits[hit])<3){
-                        game[player].score+=hits[hit];
+                for(var p in game){
+                    if(count(game[p].hits,hit)<3){
+                        game[p].score+=hit;
                     }
                 }
             }else{
 
-                game[player].hits.push(hits[hit]);
+                game[player].hits.push(hit);
 
             }
 
