@@ -33,7 +33,7 @@
     <div class="input-group input-group-lg">
         <input type="text" class="form-control" id="newPlayer" placeholder="New player's name">
     <span class="input-group-btn">
-        <button class="btn btn-default" type="button" onclick="add()">Add</button>
+        <button class="btn btn-default" type="button" onclick="addPlayer()">Add</button>
     </span>
     </div>
 
@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="clearHits();">Close</button>
                     <button type="button" class="btn btn-primary" onclick="saveHits();">Save changes</button>
                 </div>
             </div>
@@ -71,7 +71,6 @@
 
 <script language="JavaScript">
     var game = {Player1:{hits:[20,20,20,18,18,25],score:25},Player2:{hits:[20,20,20,18,18,25,25,25],score:20}};
-    var score = {15:15,16:16,17:17,18:18,19:19,20:20,25:"Bull"};
 
     function count(player,number) {
         return jQuery.grep(player, function (a) {
@@ -155,26 +154,33 @@
     }
 
     function saveHits(){
-
         for(var hit in hits){
             game[$('#modalPlayerName')[0].innerText].hits.push(hits[hit]);
 
         }
 
-        hits = new Array();
-        drawGame();
+        clearHits();
 
         $('#hitModal').modal('hide');
     }
 
+    function clearHits(){
+        hits = new Array();
+        drawGame();
 
-    function add(){
+    }
+
+
+    function addPlayer(){
         var name_input = $("#newPlayer")[0];
         var name = name_input.value;
-        name_input.value = "" ;
-        game[name] = {score:0,hits:new Array()};
+        if(name.length!=0){
+            name_input.value = "" ;
+            game[name] = {score:0,hits:new Array()};
 
-        drawGame();
+            drawGame();
+
+        }
     }
 
 
