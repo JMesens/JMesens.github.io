@@ -62,7 +62,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="clearHits();">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="game.clearThrows();drawGame()">Close</button>
                     <button type="button" class="btn btn-primary" onclick="saveHits();">Register hit</button>
                 </div>
             </div>
@@ -91,7 +91,7 @@
 
 <script language="JavaScript">
 
-    function Player(name){
+    function Player(name,hits,score){
         this.name = name;
         this.hits = new Array();
         this.score = 0;
@@ -100,8 +100,19 @@
                 return a == number;
             }).length;
         }
+
+        this.addHit = function(hit){
+            this.hits.push(hit);
+        }
+
+        if(hits!=null){
+            this.hits = hits;
+        }
+        if(score!=null){
+            this.score = score;
+        }
     }
-    function Game(){
+    function Game(savedGame){
         this.players = new Array();
 
         this.getPlayer = function(name){
@@ -117,15 +128,26 @@
             this.players.push(new Player(name));
         }
 
+
+        this.clearThrows = function(){
+            this.throws = {player:null,hits:[]};
+        };
+        this.clearThrows();
+
+        if(savedGame!=null){
+            for(var p in savedGame.players){
+                var player = savedGame.players[p];
+                this.players.push(new Player(player.name,player.hits,player.score));
+            }
+        }
+
     };
 
-    var g = new Game();
-    g.addPlayer('jeff');
+    var game = new Game();
 
-
-    var game =null;
     if(localStorage.getItem('game')!=null){
-        game = JSON.parse(localStorage.getItem('game'));drawGame();
+        game = new Game(JSON.parse(localStorage.getItem('game')));
+        drawGame();
     }
 
     $("#newPlayer").keyup(function(event){
@@ -134,11 +156,8 @@
         }
     });
 
-    function count(player,number) {
-        return jQuery.grep(player, function (a) {
-            return a == number;
-        }).length;
-    }
+    var scores = [15,16,17,18,19,20,{n:"Bull",v:25}];
+
     function drawGame(){
         if($("#board")[0]!=null){
             $("#scoreboard")[0].removeChild($("#board")[0]);
@@ -155,22 +174,24 @@
         header_cel_name.innerText = "Name, points";
         header_row.appendChild(header_cel_name);
 
-        for(var i = 15;i<=20;i++){
+        for(var i in scores){
+            var score = scores[i];
+            if(score.n !=null){
+                score = score.n;
+            }
             var header_cel = document.createElement('th');
-            header_cel.innerText = i;
+            header_cel.innerText = score;
             header_row.appendChild(header_cel);
         }
 
-        var header_cel = document.createElement('th');
-        header_cel.innerText = "Bull";
-        header_row.appendChild(header_cel);
-
-        for(var player in game) {
+        for(var p in game.players) {
+            var player = game.players[p];
 
             var row = table.insertRow();
 
             var celName = row.insertCell();
-            celName.innerText = player + " # " + game[player].score;
+
+            celName.innerText = player.name + " # " + player.score;
             celName.onclick =(function() {
                 var currentPlayer = player;
                 return function() {
@@ -178,15 +199,16 @@
                 }
             })();
 
-            for(var i = 15;i<=20;i++){
+            for(var i in scores){
+                var score = scores[i];
+                if(score.v!=null){
+                    score = score.v;
+                }
                 var cel = row.insertCell();
-                cel.innerText = count(game[player].hits,i);
+                var img = document.createElement('img');
+                img.src = "img/"+player.count(score)+".png";
+                cel.appendChild(img);
             }
-
-            var celBull = row.insertCell();
-            celBull.innerText = count(game[player].hits,25);
-
-
 
         }
         $("#scoreboard")[0].appendChild(table);
@@ -196,12 +218,12 @@
     }
 
     function select(player){
-        hits = new Array();
-        console.log("Selected: ", player);
-        $('#modalPlayerName')[0].innerText = player;
+        game.throws.hits = [];
+        game.throws.player = player;
+        console.log("Selected: ", player.name);
 
 
-        // Clear hits
+        $('#modalPlayerName')[0].innerText = player.name;
         while ($('#modalHits')[0].firstChild) {
             $('#modalHits')[0].removeChild($('#modalHits')[0].firstChild);
         }
@@ -209,51 +231,46 @@
         $('#hitModal').modal('toggle')
     }
 
-    var hits = new Array();
+
     function hit(number){
         var hitLabel = document.createElement("span");
         hitLabel.className="label label-success";
         hitLabel.innerText=number;
         $('#modalHits')[0].appendChild(hitLabel);
 
-        hits.push(number);
+        game.throws.hits.push(number);
 
     }
 
     function saveHits(){
-        var player = $('#modalPlayerName')[0].innerText;
-        for(var i in hits){
-            var hit = hits[i];
-            var playerHits = count(game[player].hits,hit);
+        for(var i in game.throws.hits){
+            var hit = game.throws.hits[i];
+            var playerHits = game.throws.player.count(hit);
             if(playerHits>=3){
-                for(var p in game){
-                    if(count(game[p].hits,hit)<3){
-                        game[p].score+=hit;
+                for(var p in game.players){
+                    if(game.players[p].count(hit)<3){
+                        game.players[p].score+=hit;
                     }
                 }
             }else{
-                game[player].hits.push(hit);
+                game.throws.player.addHit(hit);
 
             }
         }
 
-        clearHits();
-
+        game.clearThrows();
+        drawGame();
         $('#hitModal').modal('hide');
     }
 
-    function clearHits(){
-        hits = new Array();
-        drawGame();
 
-    }
 
     function addPlayer(){
         var name_input = $("#newPlayer")[0];
         var name = name_input.value.trim();
         if(name.length!=0){
             name_input.value = "" ;
-            game[name] = {score:0,hits:new Array()};
+            game.addPlayer(name);
 
             drawGame();
 
@@ -266,7 +283,7 @@
 
 
     function reset(){
-        game = new Object();
+        game = new Game();
         drawGame();
         $('#confirmModal').modal('toggle');
     }
