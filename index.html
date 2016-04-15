@@ -2,90 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cricket Cut Throat Scoreboard</title>
-
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
 </head>
-<body>
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="js/bootstrap.min.js"></script>
+<body ng-app="Cricket">
 
-<div class="container">
-    <b>Cricket Cut Throat Scoreboard</b>
-    <p>Tab a player's name to register hits.</p>
+<div class="container" ng-controller="ScoreController">
+    <p class="md-headline">Cricket Cut Throat Scoreboard</p>
+    <p class="md-title">Tab a player's name to register hits.</p>
     <div id="scoreboard">
+    </div>
+    
+    <md-input-container>
+        <label>New player's name</label>
+        <input ng-model="user.name">
+    </md-input-container>
+    <md-button class="md-raised md-cornered" onclick="addPlayer();">Add</md-button><br />
+    <md-button class="md-primary md-hue-1" onclick="confirmReset();">Reset</md-button><br />
+
+    <p>Player name</p>
+
+    <md-button class="md-raised md-cornered" onclick="hit(15)">15</md-button>
+    <md-button class="md-raised md-cornered" onclick="hit(16)">16</md-button>
+    <md-button class="md-raised md-cornered" onclick="hit(17)">17</md-button>
+    <md-button class="md-raised md-cornered" onclick="hit(18)">18</md-button>
+    <md-button class="md-raised md-cornered" onclick="hit(19)">19</md-button>
+    <md-button class="md-raised md-cornered" onclick="hit(20)">20</md-button>
+    <md-button class="md-raised md-cornered" onclick="hit(25)">Bull</md-button>
+
+    <div id="modalHits">
 
     </div>
-
-    <div class="input-group input-group-lg">
-        <input type="text" class="form-control" id="newPlayer" placeholder="New player's name">
-    <span class="input-group-btn">
-        <button class="btn btn-default" type="button" onclick="addPlayer();">Add</button>
-    </span>
-    </div>
-
-    <br/><br/><br/>
-    <p class="text-right"><a onclick="confirmReset();">Reset</a></p>
-
-    <!-- Modal -->
-    <div class="modal fade" id="hitModal" tabindex="-1" role="dialog" aria-labelledby="modalPlayerName" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="modalPlayerName">Player Name</h4>
-                </div>
-                <div class="modal-body">
-                    <button type="button" class="btn btn-default btn-block" onclick="hit(15)">15</button>
-                    <button type="button" class="btn btn-default btn-block" onclick="hit(16)">16</button>
-                    <button type="button" class="btn btn-default btn-block" onclick="hit(17)">17</button>
-                    <button type="button" class="btn btn-default btn-block" onclick="hit(18)">18</button>
-                    <button type="button" class="btn btn-default btn-block" onclick="hit(19)">19</button>
-                    <button type="button" class="btn btn-default btn-block" onclick="hit(20)">20</button>
-                    <button type="button" class="btn btn-default btn-block" onclick="hit(25)">Bull</button>
-
-                    <div id="modalHits">
-
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="game.clearThrows();drawGame()">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="saveHits();">Register hit</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="modalConfirmLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="modalConfirmLabel">Are you sure?</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Resetting will remove all current players and scores.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="reset();">Reset</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <md-button class="md-raised md-cornered" data-dismiss="modal" onclick="game.clearThrows();drawGame()">Close</md-button>
+    <md-button class="md-raised md-cornered" onclick="saveHits();">Register hit</md-button>
+  
+    <p>Resetting will remove all current players and scores.</p>
+    <md-button type="button" class="md-raised md-cornered" data-dismiss="modal">Close</md-button>
+    <md-button type="button" class="md-raised md-cornered" onclick="reset();">Reset</md-button>
 </div>
 
 
@@ -150,18 +105,18 @@
         drawGame();
     }
 
-    $("#newPlayer").keyup(function(event){
-        if(event.keyCode == 13){
-            addPlayer();
-        }
-    });
+    //("#newPlayer").keyup(function(event){
+    //     if(event.keyCode == 13){
+    //         addPlayer();
+    //     }
+    // });
 
     var scores = [15,16,17,18,19,20,{n:"Bull",v:25}];
 
     function drawGame(){
-        if($("#board")[0]!=null){
-            $("#scoreboard")[0].removeChild($("#board")[0]);
-        }
+        // if($("#board")[0]!=null){
+        //     $("#scoreboard")[0].removeChild($("#board")[0]);
+        // }
         var table = document.createElement("table");
         table.id = 'board';
         table.className = "table table-bordered";
@@ -211,7 +166,7 @@
             }
 
         }
-        $("#scoreboard")[0].appendChild(table);
+        //$("#scoreboard")[0].appendChild(table);
 
         // Persist the scoreboard
         localStorage.setItem('game',JSON.stringify(game));
@@ -291,7 +246,14 @@
     drawGame();
 
 </script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
 
+<!-- Angular Material Library -->
+<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
+<script src="scripts/app.js"></script>
 
 </body>
 </html>
