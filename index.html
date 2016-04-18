@@ -9,18 +9,21 @@
 </head>
 <body ng-app="Cricket">
 
-<div class="container" ng-controller="ScoreController">
+<div ng-controller="ScoreController as vm">
     <p class="md-headline">Cricket Cut Throat Scoreboard</p>
     <p class="md-title">Tab a player's name to register hits.</p>
     <div id="scoreboard">
+        <div ng-repeat="player in vm.game.players">
+            {{player.name}} {{player.hits}}
+        </div>
     </div>
     
     <md-input-container>
         <label>New player's name</label>
-        <input ng-model="user.name">
+        <input ng-model="name">
     </md-input-container>
-    <md-button class="md-raised md-cornered" onclick="addPlayer();">Add</md-button><br />
-    <md-button class="md-primary md-hue-1" onclick="confirmReset();">Reset</md-button><br />
+    <md-button class="md-raised md-cornered" ng-click="vm.add(name);">Add</md-button><br />
+    <md-button class="md-primary md-hue-1" ng-click="vm.reset();">Reset</md-button><br />
 
     <p>Player name</p>
 
@@ -38,214 +41,8 @@
     <md-button class="md-raised md-cornered" data-dismiss="modal" onclick="game.clearThrows();drawGame()">Close</md-button>
     <md-button class="md-raised md-cornered" onclick="saveHits();">Register hit</md-button>
   
-    <p>Resetting will remove all current players and scores.</p>
-    <md-button type="button" class="md-raised md-cornered" data-dismiss="modal">Close</md-button>
-    <md-button type="button" class="md-raised md-cornered" onclick="reset();">Reset</md-button>
 </div>
 
-
-<script language="JavaScript">
-
-    function Player(name,hits,score){
-        this.name = name;
-        this.hits = new Array();
-        this.score = 0;
-        this.count = function(number){
-            return jQuery.grep(this.hits, function (a) {
-                return a == number;
-            }).length;
-        }
-
-        this.addHit = function(hit){
-            this.hits.push(hit);
-        }
-
-        if(hits!=null){
-            this.hits = hits;
-        }
-        if(score!=null){
-            this.score = score;
-        }
-    }
-    function Game(savedGame){
-        this.players = new Array();
-
-        this.getPlayer = function(name){
-            for(var p in this.players){
-                if(this.players[p].name == name){
-                    return this.players[p];
-                }
-            }
-            return null;
-        }
-
-        this.addPlayer = function(name){
-            this.players.push(new Player(name));
-        }
-
-
-        this.clearThrows = function(){
-            this.throws = {player:null,hits:[]};
-        };
-        this.clearThrows();
-
-        if(savedGame!=null){
-            for(var p in savedGame.players){
-                var player = savedGame.players[p];
-                this.players.push(new Player(player.name,player.hits,player.score));
-            }
-        }
-
-    };
-
-    var game = new Game();
-
-    if(localStorage.getItem('game')!=null){
-        game = new Game(JSON.parse(localStorage.getItem('game')));
-        drawGame();
-    }
-
-    //("#newPlayer").keyup(function(event){
-    //     if(event.keyCode == 13){
-    //         addPlayer();
-    //     }
-    // });
-
-    var scores = [15,16,17,18,19,20,{n:"Bull",v:25}];
-
-    function drawGame(){
-        // if($("#board")[0]!=null){
-        //     $("#scoreboard")[0].removeChild($("#board")[0]);
-        // }
-        var table = document.createElement("table");
-        table.id = 'board';
-        table.className = "table table-bordered";
-
-        var header = table.createTHead();
-        var header_row = header.insertRow();
-
-
-        var header_cel_name = document.createElement('th');
-        header_cel_name.innerText = "Name, points";
-        header_row.appendChild(header_cel_name);
-
-        for(var i in scores){
-            var score = scores[i];
-            if(score.n !=null){
-                score = score.n;
-            }
-            var header_cel = document.createElement('th');
-            header_cel.innerText = score;
-            header_row.appendChild(header_cel);
-        }
-
-        for(var p in game.players) {
-            var player = game.players[p];
-
-            var row = table.insertRow();
-
-            var celName = row.insertCell();
-
-            celName.innerText = player.name + " # " + player.score;
-            celName.onclick =(function() {
-                var currentPlayer = player;
-                return function() {
-                    select(currentPlayer);
-                }
-            })();
-
-            for(var i in scores){
-                var score = scores[i];
-                if(score.v!=null){
-                    score = score.v;
-                }
-                var cel = row.insertCell();
-                var img = document.createElement('img');
-                img.src = "img/"+player.count(score)+".png";
-                cel.appendChild(img);
-            }
-
-        }
-        //$("#scoreboard")[0].appendChild(table);
-
-        // Persist the scoreboard
-        localStorage.setItem('game',JSON.stringify(game));
-    }
-
-    function select(player){
-        game.throws.hits = [];
-        game.throws.player = player;
-        console.log("Selected: ", player.name);
-
-
-        $('#modalPlayerName')[0].innerText = player.name;
-        while ($('#modalHits')[0].firstChild) {
-            $('#modalHits')[0].removeChild($('#modalHits')[0].firstChild);
-        }
-
-        $('#hitModal').modal('toggle')
-    }
-
-
-    function hit(number){
-        var hitLabel = document.createElement("span");
-        hitLabel.className="label label-success";
-        hitLabel.innerText=number;
-        $('#modalHits')[0].appendChild(hitLabel);
-
-        game.throws.hits.push(number);
-
-    }
-
-    function saveHits(){
-        for(var i in game.throws.hits){
-            var hit = game.throws.hits[i];
-            var playerHits = game.throws.player.count(hit);
-            if(playerHits>=3){
-                for(var p in game.players){
-                    if(game.players[p].count(hit)<3){
-                        game.players[p].score+=hit;
-                    }
-                }
-            }else{
-                game.throws.player.addHit(hit);
-
-            }
-        }
-
-        game.clearThrows();
-        drawGame();
-        $('#hitModal').modal('hide');
-    }
-
-
-
-    function addPlayer(){
-        var name_input = $("#newPlayer")[0];
-        var name = name_input.value.trim();
-        if(name.length!=0){
-            name_input.value = "" ;
-            game.addPlayer(name);
-
-            drawGame();
-
-        }
-    }
-
-    function confirmReset(){
-        $('#confirmModal').modal('toggle');
-    }
-
-
-    function reset(){
-        game = new Game();
-        drawGame();
-        $('#confirmModal').modal('toggle');
-    }
-
-    drawGame();
-
-</script>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
