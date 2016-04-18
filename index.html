@@ -13,8 +13,8 @@
     <p class="md-headline">Cricket Cut Throat Scoreboard</p>
     <p class="md-title">Tab a player's name to register hits.</p>
     <div id="scoreboard">
-        <div ng-repeat="player in vm.game.players">
-            {{player.name}} {{player.hits}}
+        <div ng-repeat="player in vm.game.players.values()">
+           <md-button class="md-raised md-cornered" ng-click="vm.selectPlayer(player.name)"> {{player.name}} {{player.hits}} {{player.points}} </md-button>
         </div>
     </div>
     
@@ -25,32 +25,28 @@
     <md-button class="md-raised md-cornered" ng-click="vm.add(name);">Add</md-button><br />
     <md-button class="md-primary md-hue-1" ng-click="vm.reset();">Reset</md-button><br />
 
-    <p>Player name</p>
+    <div ng-show="vm.selectedPlayer!=null">
+        <p class="md-title">Current Player: {{vm.selectedPlayer}}</p>
 
-    <md-button class="md-raised md-cornered" onclick="hit(15)">15</md-button>
-    <md-button class="md-raised md-cornered" onclick="hit(16)">16</md-button>
-    <md-button class="md-raised md-cornered" onclick="hit(17)">17</md-button>
-    <md-button class="md-raised md-cornered" onclick="hit(18)">18</md-button>
-    <md-button class="md-raised md-cornered" onclick="hit(19)">19</md-button>
-    <md-button class="md-raised md-cornered" onclick="hit(20)">20</md-button>
-    <md-button class="md-raised md-cornered" onclick="hit(25)">Bull</md-button>
-
-    <div id="modalHits">
+        <md-button class="md-raised md-cornered" ng-click="vm.hit(15)">15</md-button>
+        <md-button class="md-raised md-cornered" ng-click="vm.hit(16)">16</md-button>
+        <md-button class="md-raised md-cornered" ng-click="vm.hit(17)">17</md-button>
+        <md-button class="md-raised md-cornered" ng-click="vm.hit(18)">18</md-button>
+        <md-button class="md-raised md-cornered" ng-click="vm.hit(19)">19</md-button>
+        <md-button class="md-raised md-cornered" ng-click="vm.hit(20)">20</md-button>
+        <md-button class="md-raised md-cornered" ng-click="vm.hit(25)">Bull</md-button>
 
     </div>
-    <md-button class="md-raised md-cornered" data-dismiss="modal" onclick="game.clearThrows();drawGame()">Close</md-button>
-    <md-button class="md-raised md-cornered" onclick="saveHits();">Register hit</md-button>
-  
 </div>
 
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js"></script>
-
 <!-- Angular Material Library -->
 <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js"></script>
 <script src="scripts/app.js"></script>
+<script src="scripts/hashmap.js"></script>
 
 </body>
 </html>

@@ -7,20 +7,28 @@ module app{
     }
     
     class ScoreController{
-        game = new ScoreBoard();
+        game: IScoreBoard;
         scope: IScope;
         toast: angular.material.IToastService;
         dialog: angular.material.IDialogService;
+        selectedPlayer: string;
         
         constructor($scope: IScope, $mdToast: angular.material.IToastService, $mdDialog: angular.material.IDialogService){
             this.scope = $scope;
             this.toast = $mdToast;
             this.dialog = $mdDialog;
+            this.game = new ScoreBoard();
+            
+            //TODO: Remove
+            this.add("Jeff");
+            this.add("Bram");
         }
         add(name:string){
-            if(name==undefined)
+            if(name==""){
                 return;
-            if(this.game.add(name)){
+            }
+            var isAdded = this.game.add(name);
+            if(isAdded){
                 this.scope.name="";
                 this.showNotification("Player " + name + " added.");
             }else{
@@ -35,6 +43,9 @@ module app{
                     .hideDelay(3000)
             );
         }
+        hit(hit: number){
+            this.game.registerHit(this.selectedPlayer,hit);
+        }
         reset($event: MouseEvent){
             var confirm = this.dialog.confirm()
                 .title('Reset game?')
@@ -45,77 +56,90 @@ module app{
                 .cancel('Cancel');
             this.dialog.show(confirm).then(
                 () => {
-                    this.game.initial();
+                    this.game = new ScoreBoard();
                     this.showNotification("Game is reset.");
             });
         }
-            
+        selectPlayer(name: string){
+            this.selectedPlayer = name;
+        }
 
     }
 
     interface IScoreBoard{
-        players: { [name: string]: Player; };
-        registerHit(Player, number): void;
-        initial(): void;
-        get(name: string): Player;
+        registerHit(IPlayer, number): void;
         add(name: string): boolean;
-        
     }
-
+   
     class ScoreBoard implements IScoreBoard{
-        players:  { [name: string]: Player; };
+        players: HashMap<string,IPlayer>;
         
         constructor(){
-            this.initial();
-            this.add("Jeff");
-        }
-        initial(): void{
-            this.players = {};
+            this.players = new HashMap<string,Player>();
         }
         registerHit(name: string, hit: number): void{
-            this.get(name).registerHit(hit);
+            if(!this.get(name).registerHit(hit)){
+                this.players.forEach((v,k) => {
+                    if(k!=name){
+                        this.get(k).registerScore(hit);
+                    }
+                });
+            }
         }
         get(name:string){
-            return this.players[name];
+            return this.players.get(name);
         }
         add(name:string){
             if(this.get(name)==null){
-                this.players[name] = new Player(name);
+                this.players.set(name, new Player(name));
                 return true;
             }
             return false;
-            
         }
         
+        
+    }
+    
+    interface IPlayer{
+        registerHit(hit: number): boolean;
+        registerScore(hit: number): void;
     }
 
-    class Player{
-        hits: any[];
-        points: number;
+    class Player implements IPlayer{
+        private hits: Array<number>;
+        private points: number;
         
         constructor(public name: string){
             this.name=name;
             this.initial();
+            this.hits = new Array<number>();
         }
-        initial(){
+        private initial(){
             this.hits = [];
             this.points = 0;
         }
         registerHit(hit: number){
+            if(this.countHits(hit)==3){
+                return false;
+            }
             this.hits = this.hits.concat(hit);
+            return true;
+        }
+        registerScore(hit: number){
+            if(this.countHits(hit)<3){
+                this.points += hit;
+            }
+        }
+        private countHits(hit:number){
+            var count = 0;
+            this.hits.forEach((v,k)=>{
+                if(v==hit){
+                    count++;
+                }
+            })
+            return count;
         }
     }
-
-    // var player = new Player("Jeff");
-    // console.log(player);
-    // player.registerHit(20);
-    // console.log(player);
-
-    // var scoreBoard = new ScoreController();
-    // console.log(scoreBoard);
-    // console.log(scoreBoard.get("Jeff"));
-    // scoreBoard.registerHit("Jeff",19);
-    // console.log(scoreBoard.get("Jeff"));
 
     angular.module("Cricket", [ 'ngMaterial' ] )
         .controller("ScoreController",  ScoreController);
